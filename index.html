@@ -23,27 +23,57 @@
         /* Fond Dot Grid */
         .dot-grid-background {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
             background-color: #0d0d0d;
             background-image: radial-gradient(circle, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
             background-size: 30px 30px;
             z-index: -2;
+            transition: transform 0.3s ease-out;
         }
 
         /* Effet de gradient au-dessus du dot grid */
         .gradient-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
             background: radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.15) 50%, transparent 80%);
             z-index: -1;
             pointer-events: none;
             transition: transform 0.3s ease-out;
+        }
+
+        /* Particules animées */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            animation: particleFloat linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
         }
 
         .cv-container {
@@ -56,6 +86,8 @@
             overflow: hidden;
             animation: fadeIn 0.8s ease-out;
             border: 1px solid rgba(102, 126, 234, 0.3);
+            transition: transform 0.1s ease-out;
+            transform-style: preserve-3d;
         }
 
         @keyframes fadeIn {
@@ -66,6 +98,46 @@
             to {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.6);
             }
         }
 
@@ -205,6 +277,8 @@
             border-radius: 8px;
             border-left: 3px solid #667eea;
             transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
         }
 
         .language-item:hover {
@@ -221,6 +295,24 @@
         .language-level {
             font-size: 0.9rem;
             color: #a0a0a0;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+            transition: width 1s ease-out;
+            width: 0;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
         }
 
         /* Diplomas */
@@ -384,7 +476,8 @@
             }
 
             .dot-grid-background,
-            .gradient-overlay {
+            .gradient-overlay,
+            .particle {
                 display: none;
             }
 
@@ -395,6 +488,10 @@
             }
 
             .header::before {
+                display: none;
+            }
+
+            .progress-bar {
                 display: none;
             }
         }
@@ -441,17 +538,26 @@
                         <span class="section-icon">🌍</span>
                         Langues
                     </h2>
-                    <div class="language-item">
+                    <div class="language-item" data-progress="100">
                         <div class="language-name">Français</div>
                         <div class="language-level">Langue maternelle</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
                     </div>
-                    <div class="language-item">
+                    <div class="language-item" data-progress="40">
                         <div class="language-name">Allemand</div>
                         <div class="language-level">Niveau A2</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
                     </div>
-                    <div class="language-item">
+                    <div class="language-item" data-progress="60">
                         <div class="language-name">Anglais</div>
                         <div class="language-level">Scolaire</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
                     </div>
                 </section>
 
@@ -562,44 +668,164 @@
     </div>
 
     <script>
+        // Créer des particules animées
+        function createParticles() {
+            const particleCount = 30;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                document.body.appendChild(particle);
+            }
+        }
+
+        // Effet de typing pour le titre
+        function typeWriter(element, text, speed = 100) {
+            let i = 0;
+            element.textContent = '';
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Animer les barres de progression
+        function animateProgressBars() {
+            const languageItems = document.querySelectorAll('.language-item');
+            languageItems.forEach((item, index) => {
+                const progressFill = item.querySelector('.progress-fill');
+                const targetWidth = item.getAttribute('data-progress') || 0;
+                
+                setTimeout(() => {
+                    progressFill.style.width = targetWidth + '%';
+                }, index * 200);
+            });
+        }
+
         // Effet parallaxe sur le fond dot-grid au mouvement de la souris
+        let isDesktop = window.innerWidth > 768;
+        
         document.addEventListener('mousemove', (e) => {
-            const moveX = (e.clientX - window.innerWidth / 2) * 0.015;
-            const moveY = (e.clientY - window.innerHeight / 2) * 0.015;
+            if (!isDesktop) return; // Désactiver sur mobile pour les performances
+            
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+            
+            // Parallaxe sur le gradient (couche avant)
+            const moveX = (e.clientX - window.innerWidth / 2) * 0.02;
+            const moveY = (e.clientY - window.innerHeight / 2) * 0.02;
             
             const gradientOverlay = document.querySelector('.gradient-overlay');
             gradientOverlay.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            
+            // Parallaxe sur la grille de points (couche arrière)
+            const dotGrid = document.querySelector('.dot-grid-background');
+            const dotMoveX = (e.clientX - window.innerWidth / 2) * 0.01;
+            const dotMoveY = (e.clientY - window.innerHeight / 2) * 0.01;
+            dotGrid.style.transform = `translate(${dotMoveX}px, ${dotMoveY}px)`;
+            
+            // Modifier légèrement la position du gradient radial
+            const gradientX = 30 + (mouseX * 40);
+            const gradientY = 30 + (mouseY * 40);
+            gradientOverlay.style.background = `radial-gradient(circle at ${gradientX}% ${gradientY}%, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.15) 50%, transparent 80%)`;
+            
+            // Effet 3D léger sur le container principal
+            const cvContainer = document.querySelector('.cv-container');
+            const rotateY = (mouseX - 0.5) * 2; // -1 à 1 degrés
+            const rotateX = (mouseY - 0.5) * -2; // -1 à 1 degrés inversé
+            cvContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+        
+        // Mettre à jour isDesktop lors du redimensionnement
+        window.addEventListener('resize', () => {
+            isDesktop = window.innerWidth > 768;
         });
 
-        // Animation au scroll
+        // Animation au scroll avec effet stagger
         const observerOptions = {
             threshold: 0.2,
             rootMargin: '0px 0px -50px 0px'
         };
 
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
+            entries.forEach((entry, index) => {
                 if (entry.isIntersecting) {
-                    entry.target.style.opacity = '0';
-                    entry.target.style.transform = 'translateY(20px)';
-                    entry.target.style.animation = 'fadeIn 0.6s ease-out forwards';
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, index * 50);
                 }
             });
         }, observerOptions);
 
-        document.querySelectorAll('.timeline-item, .language-item, .diploma-item').forEach(el => {
+        document.querySelectorAll('.timeline-item, .diploma-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease-out';
             observer.observe(el);
         });
 
-        // Effet hover interactif sur les items
+        // Animation de la sidebar avec slideInLeft
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.style.opacity = '0';
+        sidebar.style.transform = 'translateX(-50px)';
+        sidebar.style.transition = 'all 0.8s ease-out';
+
+        setTimeout(() => {
+            sidebar.style.opacity = '1';
+            sidebar.style.transform = 'translateX(0)';
+        }, 300);
+
+        // Animation du contenu principal avec slideInRight
+        const mainContent = document.querySelector('.main-content');
+        mainContent.style.opacity = '0';
+        mainContent.style.transform = 'translateX(50px)';
+        mainContent.style.transition = 'all 0.8s ease-out';
+
+        setTimeout(() => {
+            mainContent.style.opacity = '1';
+            mainContent.style.transform = 'translateX(0)';
+        }, 500);
+
+        // Effet hover interactif sur les items avec animation
         document.querySelectorAll('.timeline-item, .language-item, .diploma-item, .info-badge').forEach(item => {
             item.addEventListener('mouseenter', function(e) {
-                this.style.transform = 'translateX(5px)';
+                this.style.transform = 'translateX(5px) scale(1.02)';
             });
             
             item.addEventListener('mouseleave', function(e) {
-                this.style.transform = 'translateX(0)';
+                this.style.transform = 'translateX(0) scale(1)';
             });
+        });
+
+        // Animation des icônes emoji avec rotation
+        document.querySelectorAll('.section-icon').forEach(icon => {
+            icon.addEventListener('mouseenter', function() {
+                this.style.transform = 'rotate(360deg) scale(1.2)';
+                this.style.transition = 'transform 0.5s ease';
+            });
+            
+            icon.addEventListener('mouseleave', function() {
+                this.style.transform = 'rotate(0deg) scale(1)';
+            });
+        });
+
+        // Animation des contact items
+        document.querySelectorAll('.contact-item').forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(-20px)';
+            
+            setTimeout(() => {
+                item.style.transition = 'all 0.5s ease-out';
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, 800 + (index * 100));
         });
 
         // Bouton d'impression
@@ -613,7 +839,58 @@
         window.addEventListener('load', () => {
             const gradientOverlay = document.querySelector('.gradient-overlay');
             gradientOverlay.style.transition = 'transform 0.3s ease-out';
+            
+            // Créer les particules
+            createParticles();
+            
+            // Animer le titre avec effet typing
+            const title = document.querySelector('.header h1');
+            const originalText = title.textContent;
+            typeWriter(title, originalText, 80);
+            
+            // Démarrer l'animation des barres de progression après un délai
+            setTimeout(() => {
+                animateProgressBars();
+            }, 1500);
         });
+
+        // Effet de pulse sur les diplômes au scroll
+        const diplomaObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeIn 0.6s ease-out';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.diploma-item').forEach(el => {
+            diplomaObserver.observe(el);
+        });
+
+        // Compteur animé pour l'âge (effet dynamique)
+        const ageElement = document.querySelector('.age-info');
+        if (ageElement) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        let count = 0;
+                        const target = 19;
+                        const increment = () => {
+                            if (count < target) {
+                                count++;
+                                entry.target.innerHTML = `Né le 9 mai 2006 à Haguenau • ${count} ans`;
+                                setTimeout(increment, 50);
+                            } else {
+                                entry.target.innerHTML = `Né le 9 mai 2006 à Haguenau • ${target} ans`;
+                            }
+                        };
+                        increment();
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            observer.observe(ageElement);
+        }
     </script>
 </body>
 </html>
